@@ -75,7 +75,7 @@ public class FetchByStates extends IFetch {
     // Build the JSONObject to be returned.
     protected JSONObject buildJSON() {
 
-        JSONArray mainArray = new JSONArray();
+        JSONArray parkArray = new JSONArray();
         JSONObject mainBody = new JSONObject();
         JSONProcessing.makeTheJSONObjectOrdered( mainBody );
 
@@ -83,8 +83,8 @@ public class FetchByStates extends IFetch {
         mainBody.put("limit" , "50");
         mainBody.put("start" , "0");
         for( Map.Entry<String, String> s : this.mp.entrySet() )
-            mainArray.put( new JSONObject( s.getValue() ) );
-        mainBody.put("data" , mainArray);
+            parkArray.put( new JSONObject( s.getValue() ) );
+        mainBody.put("data" , parkArray);
 
         return mainBody;
     }

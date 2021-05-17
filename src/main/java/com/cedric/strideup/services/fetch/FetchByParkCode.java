@@ -43,18 +43,20 @@ public class FetchByParkCode extends IFetch {
 
         List<DataString> dataStringList = dataStringRepo.findAllByParkCode( parkCode );
 
-        JSONObject tempObj = new JSONObject();
-        JSONArray tempArr = new JSONArray();
-        tempObj.put("total" , "1");
-        tempObj.put("limit" , "50");
-        tempObj.put("start" , "0");
+        JSONObject mainBody = new JSONObject();
+        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
+
+        JSONArray parkArray = new JSONArray();
+        mainBody.put("total" , "1");
+        mainBody.put("limit" , "50");
+        mainBody.put("start" , "0");
 
         if( dataStringList.isEmpty() == false ) {
             JSONObject tempBody = new JSONObject(dataStringList.get(0).getBody());
-            tempArr.put( tempBody );
-            tempObj.put("data" , tempArr);
+            parkArray.put( tempBody );
+            mainBody.put("data" , parkArray);
 
-            return tempObj;
+            return mainBody;
         }
         return null;
     }
@@ -70,23 +72,23 @@ public class FetchByParkCode extends IFetch {
     protected JSONObject getUnit_CheckAPI( String parkCode ) {
         getAPI.constructParam_ParkCode( parkCode );
         JSONObject json = getAPI.getAPIFlex( ); 
-        JSONObject tempObj = new JSONObject();
-        JSONProcessing.makeTheJSONObjectOrdered( tempObj );
+        JSONObject mainBody = new JSONObject();
+        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
 
-        JSONArray tempArr = new JSONArray();
-        tempObj.put("total" , "1");
-        tempObj.put("limit" , "50");
-        tempObj.put("start" , "0");
+        JSONArray parkArray = new JSONArray();
+        mainBody.put("total" , "1");
+        mainBody.put("limit" , "50");
+        mainBody.put("start" , "0");
         if( json != null ) {
             try {
                 JSONObject tempBody = new JSONObject( json.getJSONArray("data").getJSONObject(0).toString() );
 
                 String s2 = tempBody.getString("parkCode");
                 if( s2.equals(parkCode) ) {
-                    tempArr.put( tempBody );
-                    tempObj.put("data" , tempArr);
+                    parkArray.put( tempBody );
+                    mainBody.put("data" , parkArray);
                     
-                    return tempObj;
+                    return mainBody;
                 }
             } catch( Exception e ) {
                 e.printStackTrace();
@@ -111,15 +113,15 @@ public class FetchByParkCode extends IFetch {
         
         // Check the Internal DB.
         // If the Park exists, return its JSONObject.
-        JSONObject resObj = getUnit_CheckDB( parkCode , dataStringRepo );
-        if( resObj != null )
-            return resObj;
+        JSONObject resJsonObject = getUnit_CheckDB( parkCode , dataStringRepo );
+        if( resJsonObject != null )
+            return resJsonObject;
         
         // Check the RemoteAPI.
         // If the Park exists, return its JSONObject.
-        resObj = getUnit_CheckAPI( parkCode );
-        if( resObj != null )
-            return resObj;
+        resJsonObject = getUnit_CheckAPI( parkCode );
+        if( resJsonObject != null )
+            return resJsonObject;
         
         // If the Park does not exist in both the IntetnalDB and the RemoteAPI,
         return null;

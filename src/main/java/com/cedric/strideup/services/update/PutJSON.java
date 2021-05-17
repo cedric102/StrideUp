@@ -85,11 +85,11 @@ public class PutJSON {
         JSONProcessing.makeTheJSONObjectOrdered(tempObj);
         // makeTheJSONObjectOrdered(tempObj);
 
-        JSONArray tempArr = new JSONArray();
-        JSONObject tempBody = new JSONObject();
-        JSONObject tempBody2 = new JSONObject(dataStringList.get(0).getBody());
+        JSONArray parkArray = new JSONArray();
+        JSONObject mainBody = new JSONObject();
+        JSONObject mainBody2 = new JSONObject(dataStringList.get(0).getBody());
 
-        JSONProcessing.makeTheJSONObjectOrdered(tempBody);
+        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
         
         // Keep the fields in order of insartion
         for( String s : orderList ) {
@@ -101,18 +101,18 @@ public class PutJSON {
                 s.equals("operatingHours") || 
                 s.equals("addresses") || 
                 s.equals("images") )
-                tempBody.put( s , tempBody2.getJSONArray( s ) );
+                mainBody.put( s , mainBody2.getJSONArray( s ) );
             else if( s.equals("contacts") )
-                tempBody.put( s , tempBody2.getJSONObject( s ) );
+                mainBody.put( s , mainBody2.getJSONObject( s ) );
             else
-                tempBody.put( s , tempBody2.getString( s ) );
+                mainBody.put( s , mainBody2.getString( s ) );
         }
 
-        tempArr.put( tempBody );
-        tempObj.put("total" , ""+tempArr.length());
+        parkArray.put( mainBody );
+        tempObj.put("total" , ""+parkArray.length());
         tempObj.put("limit" , "50");
         tempObj.put("start" , "0");
-        tempObj.put("data" , tempArr);
+        tempObj.put("data" , parkArray);
         
         // Return the JSONObject
         return tempObj;

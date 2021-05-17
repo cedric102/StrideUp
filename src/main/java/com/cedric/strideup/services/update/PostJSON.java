@@ -53,18 +53,18 @@ public class PostJSON {
         List<DataString> dataStringList = dataStringRepo.findAllByParkCode( ds.getString("parkCode") );
  
         // Create the JSONObject corresponding to the newly created object
-        JSONObject resObj = new JSONObject();
-        JSONProcessing.makeTheJSONObjectOrdered(resObj);
+        JSONObject mainBody = new JSONObject();
+        JSONProcessing.makeTheJSONObjectOrdered(mainBody);
         
-        JSONArray resArr = new JSONArray();
-        JSONObject resBody = new JSONObject(dataStringList.get(0).getBody());
-        resArr.put( resBody );
-        resObj.put("total" , ""+resArr.length());
-        resObj.put("limit" , "50");
-        resObj.put("start" , "0");
-        resObj.put("data" , resArr);
+        JSONArray parkArray = new JSONArray();
+        JSONObject parkValues = new JSONObject(dataStringList.get(0).getBody());
+        parkArray.put( parkValues );
+        mainBody.put("total" , ""+parkArray.length());
+        mainBody.put("limit" , "50");
+        mainBody.put("start" , "0");
+        mainBody.put("data" , parkArray);
 
-        return resObj;
+        return mainBody;
     }
 
     /**
