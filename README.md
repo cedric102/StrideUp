@@ -102,3 +102,4 @@ paths:
  - In this implementation:
    - Each class tend to be single purpose only.
    - Not open for extension, but it would have been if it has been decided to carry-out the slow approach of '/services/extra/WholeDatabase.java' : Each class would extend from Database Class and implement the interface they want to in order to extract different entity.
+ - I could implement it using MongoDB. Using a NoSQL platform like thie one could resolve the Open-for-extension issue that this application is facing.
