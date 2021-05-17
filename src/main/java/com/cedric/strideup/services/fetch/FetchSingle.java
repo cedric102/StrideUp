@@ -78,7 +78,7 @@ public class FetchSingle {
                     return tempObj;
                 }
             } catch( Exception e ) {
-                return null;
+                e.printStackTrace();
             }
     
         }
