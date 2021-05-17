@@ -1,13 +1,11 @@
 package com.cedric.strideup.services.update;
 
-import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.cedric.strideup.models_dao.DataString;
-import com.cedric.strideup.models_dao.extra_dao.Response2;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
+import com.cedric.strideup.services.features.JSONProcessing;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,19 +50,6 @@ public class PutJSON {
 
     private GetAPI getAPI = new GetAPI();
     
-    // Method to keep the field in order of insertion.
-    void makeTheJSONObjectOrdered( JSONObject obj ) {
-        try{
-            Field changeMap = obj.getClass().getDeclaredField("map");
-            changeMap.setAccessible(true);
-            changeMap.set( obj , new LinkedHashMap<>() );
-            changeMap.setAccessible(false);
-            
-        } catch( Exception e ) {
-    
-        }
-    }
-    
     private JSONObject saveToDB( String dst , DataStringRepo dataStringRepo ){
 
         JSONObject ds = new JSONObject(dst);
@@ -74,7 +59,9 @@ public class PutJSON {
         // Leach if the entity already exists
         if( dsExists == null ) {
 
-            json = getAPI.getAPI( ds.getString("parkCode") );
+            getAPI.constructParam_ParkCode( ds.getString("parkCode") );
+            json = getAPI.getAPIFlex();
+
             int jsonSize = json.getJSONArray("data").length();
 
             if( jsonSize != 1 )
@@ -82,7 +69,7 @@ public class PutJSON {
         }
 
         // Update the new entity
-        DataString d = new DataString( ds.getString("parkCode") , dst );
+        DataString d = new DataString( ds.getString("parkCode") , ds.getString("states") , dst );
         dataStringRepo.save( d );
 
         return ds;
@@ -95,13 +82,14 @@ public class PutJSON {
 
         // Build the JSONObject from the extracted data from the database
         JSONObject tempObj = new JSONObject();
-        makeTheJSONObjectOrdered(tempObj);
+        JSONProcessing.makeTheJSONObjectOrdered(tempObj);
+        // makeTheJSONObjectOrdered(tempObj);
 
         JSONArray tempArr = new JSONArray();
         JSONObject tempBody = new JSONObject();
         JSONObject tempBody2 = new JSONObject(dataStringList.get(0).getBody());
 
-        makeTheJSONObjectOrdered(tempBody);
+        JSONProcessing.makeTheJSONObjectOrdered(tempBody);
         
         // Keep the fields in order of insartion
         for( String s : orderList ) {

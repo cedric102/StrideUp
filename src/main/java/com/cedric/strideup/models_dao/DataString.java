@@ -15,15 +15,19 @@ public class DataString {
     @Id 
     @Column( name = "parkCode" , unique=true , columnDefinition="VARCHAR(45)" )
     private String parkCode; 
+
+    @Column( name = "states" , columnDefinition="VARCHAR(45)" )
+    private String states; 
     
-    @Column( columnDefinition="TEXT" )
+    @Column( columnDefinition="json" )
     private String body;
 
     public DataString() {}
     
-    public DataString( String parkCode , String body ) {
+    public DataString( String parkCode , String states , String body ) {
 
         this.parkCode = parkCode;
+        this.states = states;
         this.body = body;
     }
 

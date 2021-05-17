@@ -23,22 +23,30 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchALL extends IFetch {
+public class FetchByStates extends IFetch {
 
     private GetAPI getAPI = new GetAPI();
     private Map<String ,String> mp;
 
-    public FetchALL() {}
+    public FetchByStates() {}
 
-    public FetchALL( GetAPI getAPI ) {
+    public FetchByStates( GetAPI getAPI ) {
         this.getAPI = getAPI;
     }
 
-    @Override
+    /**
+     * @Purpose : Check the Internal Database for the identified 'parkCode'
+     * @Note : If the identified 'parkNode' does not exist in the InternalDB, return null
+     * @param parkCode
+     * @param dataStringRepo
+     * @return JSONObject
+     */
+
     // Fetch from the Repote API and populate the Map
-    protected void extractFromAPI () {
+    protected void extractFromAPI ( String states ) {
 
         // Fetch from the Remote API
+        getAPI.constructParam_States( states );
         JSONObject obj = getAPI.getAPIFlex( );
 
         // Populate the Map
@@ -50,12 +58,11 @@ public class FetchALL extends IFetch {
 
     }
 
-    @Override
     // Fetch from the Internal Database and populate / override the Map
-    protected void extractFromDB ( DataStringRepo dataStringRepo ) {
+    protected void extractFromDB ( String states , DataStringRepo dataStringRepo ) {
 
         // Fetch from the Internal Database
-        List<DataString> t = dataStringRepo.findAll();
+        List<DataString> t = dataStringRepo.findAllByStates( states );
 
         // Populate / Override the Map
         for( DataString d : t ) {
@@ -81,18 +88,24 @@ public class FetchALL extends IFetch {
 
         return mainBody;
     }
+
     /**
-     * @Purpose : Inorder, perform the RemoteAPI Fetch, Internal DB Fetch, and JSON Build
-     * @Note : For each of RemoteAPI Fetch, Internal DB Fetch , The Map needs to be updated
+     * @Purpose : Method to get the Park identitied as 'parkCode'
+     * @Approach : Check if the 'parkCode' is present in the InternalDB and then the RemoteAPI
+     *             Return the result if the parkCode exists
+     *             Note: if the Park exists in the InternalDB, the RempteAPI will not even be checked 
+     *                   given that the InternalDB is the most up-to-date version from our point of view.
+     * @param parkCode
      * @param dataStringRepo
-     * @return JSONObject
+     * @return
      */
     @Override
-    public JSONObject getAll( DataStringRepo dataStringRepo ) {
+    public JSONObject getUnit( String states , DataStringRepo dataStringRepo ) {
+        
         this.mp = new HashMap<String ,String>();
 
-        extractFromAPI();
-        extractFromDB( dataStringRepo );
+        extractFromAPI( states );
+        extractFromDB( states , dataStringRepo );
 
         JSONObject res = buildJSON();
         

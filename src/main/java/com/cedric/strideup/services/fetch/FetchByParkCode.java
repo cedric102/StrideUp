@@ -5,24 +5,29 @@ import java.util.List;
 import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
+import com.cedric.strideup.services.features.JSONProcessing;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * @Purpose : Fetch the Park identified as 'parkCode' and return them to as a JSONObject
+ * @Purpose : Fetch all of the Parks and return them to as a JSONObject
  * @Rule : If the same parkCode is present in both the Remote API and the Internal Database ,
- *         Use the one of the Internal Database given that it is 
+ *         Keep the one for the Internal Repository given that it is 
  *         the updated version from our point of view
+ * @Approach : Store the Fetched data in a Map<String, String>. 
+ *             The first key contains the parkCode and the second contains 
+ *             the whole JSONObject represented as a string
+ *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchSingle {
-    
+public class FetchByParkCode extends IFetch {
+
     private GetAPI getAPI = new GetAPI();
-    
-    public FetchSingle() {}
-    
-    public FetchSingle( GetAPI getAPI ) {
+
+    public FetchByParkCode() {}
+
+    public FetchByParkCode( GetAPI getAPI ) {
         this.getAPI = getAPI;
     }
 
@@ -33,7 +38,8 @@ public class FetchSingle {
      * @param dataStringRepo
      * @return JSONObject
      */
-    private JSONObject getUnit_CheckDB( String parkCode , DataStringRepo dataStringRepo ) {
+    @Override
+    protected JSONObject getUnit_CheckDB( String parkCode , DataStringRepo dataStringRepo ) {
 
         List<DataString> dataStringList = dataStringRepo.findAllByParkCode( parkCode );
 
@@ -52,6 +58,7 @@ public class FetchSingle {
         }
         return null;
     }
+    
     /**
      * @Purpose : Check the RemoreAPI for the identified 'parkCode'
      * @Note : If the identified 'parkNode' does not exist in the RemoteAPI, return null
@@ -59,9 +66,13 @@ public class FetchSingle {
      * @param dataStringRepo
      * @return JSONObject
      */
-    private JSONObject getUnit_CheckAPI( String parkCode ) {
-        JSONObject json = getAPI.getAPI( parkCode ); 
+    @Override
+    protected JSONObject getUnit_CheckAPI( String parkCode ) {
+        getAPI.constructParam_ParkCode( parkCode );
+        JSONObject json = getAPI.getAPIFlex( ); 
         JSONObject tempObj = new JSONObject();
+        JSONProcessing.makeTheJSONObjectOrdered( tempObj );
+
         JSONArray tempArr = new JSONArray();
         tempObj.put("total" , "1");
         tempObj.put("limit" , "50");
@@ -95,6 +106,7 @@ public class FetchSingle {
      * @param dataStringRepo
      * @return
      */
+    @Override
     public JSONObject getUnit( String parkCode , DataStringRepo dataStringRepo ) {
         
         // Check the Internal DB.
@@ -112,4 +124,5 @@ public class FetchSingle {
         // If the Park does not exist in both the IntetnalDB and the RemoteAPI,
         return null;
     }
+    
 }

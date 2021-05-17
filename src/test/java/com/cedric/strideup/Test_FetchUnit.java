@@ -7,22 +7,15 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cedric.strideup.controller.MainController;
 import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
-import com.cedric.strideup.services.fetch.FetchALL;
-import com.cedric.strideup.services.fetch.FetchSingle;
+import com.cedric.strideup.services.fetch.FetchByParkCode;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * @Purpose : Test the 'Get Unit' Part of the exercise
@@ -30,17 +23,14 @@ import org.springframework.test.web.servlet.MockMvc;
  * @Author : C. Carteron
  */
 public class Test_FetchUnit {
-   
-    @Autowired
-    private MockMvc mvc;
 
-    FetchSingle fetchSingle = null;
+    FetchByParkCode fetchSingle = null;
     GetAPI getAPI = mock(GetAPI.class);
     DataStringRepo dataStringRepo = mock(DataStringRepo.class);
 
     @Before
     public void setUp() {
-        fetchSingle = new FetchSingle( getAPI );
+        fetchSingle = new FetchByParkCode( getAPI );
     }
 
     /**
@@ -49,12 +39,13 @@ public class Test_FetchUnit {
      * @Result: 'getUnit' would generate non-null data
      */
     @Test
-    public void temp() {
+    public void existantData() {
 
         GetAPI getAPI2 = new GetAPI();
 
         // Generate any data
-        JSONObject json = getAPI2.getAPI("abli");
+        getAPI2.constructParam_ParkCode( "abli" );
+        JSONObject json = getAPI2.getAPIFlex();
     
         // Genetate Empty Data.
         DataString ds = new DataString();
@@ -64,7 +55,8 @@ public class Test_FetchUnit {
         l.add(ds);
 
         // Provide the expected data from the GetAPI Mockito
-        Mockito.when(getAPI.getAPI("abli")).thenReturn(json);
+        getAPI.constructParam_ParkCode( "abli" );
+        Mockito.when(getAPI.getAPIFlex()).thenReturn(json);
         Mockito.when(dataStringRepo.findAllByParkCode("abli")).thenReturn(l);
 
         // Result of the Test
@@ -83,13 +75,15 @@ public class Test_FetchUnit {
         GetAPI getAPI2 = new GetAPI();
 
         // Generate any data
-        JSONObject json = getAPI2.getAPI("abll");
+        getAPI2.constructParam_ParkCode( "abli" );
+        JSONObject json = getAPI2.getAPIFlex();
     
         // Empty Data.
         List<DataString> l = new ArrayList<>();
 
         // Provide the expected data from the GetAPI Mockito
-        Mockito.when(getAPI.getAPI("abll")).thenReturn(json);
+        getAPI.constructParam_ParkCode( "abli" );
+        Mockito.when(getAPI.getAPIFlex()).thenReturn(json);
         Mockito.when(dataStringRepo.findAllByParkCode("abll")).thenReturn(l);
 
         // Result of the Test

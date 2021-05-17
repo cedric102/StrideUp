@@ -20,20 +20,37 @@ public class GetAPI {
     private final String M_AUTHORIZATION = "api_key=UQiC8xXIenM5EUe7z3i6fBfkQh56fynBxLAvQKfn";
     private final String M_HTTP = "https://developer.nps.gov/api/v1/parks?limit=500&";
     
+    private String params = "";
+
     /**
      * @Purpose : Fetch the Data from the Remote API and return its JSONObject Representation
      * @param s
      * @return JSONObject
      */
-    public JSONObject getAPI(String s ) {
- 
-        // Step 1
-        String parkCode = ( s.equals( "" ) ) ? "" : "parkCode="+s+"&";
+    public void constructParam_ParkCode( String s ) {
+        if( !s.equals( "" ) )
+            this.params += "parkCode="+s+"&";
+    }
+    public void constructParam_States( String s ) {
+        if( !s.equals( "" ) )
+            this.params += "stateCode="+s+"&";
+    }
+
+    /**
+     * @Purpose : Fetch the Data from the Remote API and 
+     *            return its String Representation to preserve the response fields order
+     * @param s
+     * @return String
+     */
+    public JSONObject getAPIFlex() {
+
         try {
-            URL url = new URL( M_HTTP + parkCode + M_AUTHORIZATION );
+            URL url = new URL( M_HTTP + this.params + M_AUTHORIZATION );
 
             // Step 2
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            this.params = "";
 
             // Step 3
             // conn.setRequestProperty( "Authorization" , "Bearer " + M_AUTHORIZATION );
@@ -54,7 +71,6 @@ public class GetAPI {
             // Step 2
             String output; 
             StringBuilder response = new StringBuilder();
-            int i=0;
             while ( ( output = in.readLine() ) != null ) {
                 response.append( output );  
             }
@@ -62,57 +78,99 @@ public class GetAPI {
 
             return new JSONObject( response.toString() );
         } catch( Exception e ) {
-
-        }
-        return null;
-    }
-    
-    /**
-     * @Purpose : Fetch the Data from the Remote API and 
-     *            return its String Representation to preserve the response fields order
-     * @param s
-     * @return String
-     */
-    public String getAPIString(String s ) {
-
-        // Step 1
-        String parkCode = ( s.equals( "" ) ) ? "" : "parkCode="+s+"&";
-
-        try {
-            URL url = new URL( M_HTTP + parkCode + M_AUTHORIZATION );
-
-            // Step 2
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            // Step 3
-            // conn.setRequestProperty( "Authorization" , "Bearer " + M_AUTHORIZATION );
-            // conn.setRequestProperty( "Content-Type" , "application/json" );
-            conn.setRequestMethod( "GET" );
-
-            /////////////////////////////////////////////
-            // Extract the Response
-            // Step 1: Extract the Buffer
-            // Step 2: Populate the Response
-            // Step 3: Store the Response in a JSON Format
-            // Step 4: Extract the Budjet Parameter
-            /////////////////////////////////////////////
-
-            // Step 1
-            BufferedReader in = new BufferedReader( new InputStreamReader( conn.getInputStream() ) );
-         
-            // Step 2
-            String output; 
-            StringBuilder response = new StringBuilder();
-            int i=0;
-            while ( ( output = in.readLine() ) != null ) {
-                response.append( output );  
-            }
-            in.close();
-
-            return response.toString();
-        } catch( Exception e ) {
             e.printStackTrace();
         }
         return null;
     }
+
+    // public JSONObject getAPI( String s ) {
+ 
+    //     // Step 1
+    //     String parkCode = ( s.equals( "" ) ) ? "" : "parkCode="+s+"&";
+    //     try {
+    //         URL url = new URL( M_HTTP + parkCode + M_AUTHORIZATION );
+
+    //         // Step 2
+    //         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+    //         // Step 3
+    //         // conn.setRequestProperty( "Authorization" , "Bearer " + M_AUTHORIZATION );
+    //         // conn.setRequestProperty( "Content-Type" , "application/json" );
+    //         conn.setRequestMethod( "GET" );
+
+    //         /////////////////////////////////////////////
+    //         // Extract the Response
+    //         // Step 1: Extract the Buffer
+    //         // Step 2: Populate the Response
+    //         // Step 3: Store the Response in a JSON Format
+    //         // Step 4: Extract the Budjet Parameter
+    //         /////////////////////////////////////////////
+
+    //         // Step 1
+    //         BufferedReader in = new BufferedReader( new InputStreamReader( conn.getInputStream() ) );
+         
+    //         // Step 2
+    //         String output; 
+    //         StringBuilder response = new StringBuilder();
+    //         int i=0;
+    //         while ( ( output = in.readLine() ) != null ) {
+    //             response.append( output );  
+    //         }
+    //         in.close();
+
+    //         return new JSONObject( response.toString() );
+    //     } catch( Exception e ) {
+
+    //     }
+    //     return null;
+    // }
+    
+    // /**
+    //  * @Purpose : Fetch the Data from the Remote API and 
+    //  *            return its String Representation to preserve the response fields order
+    //  * @param s
+    //  * @return String
+    //  */
+    // public String getAPIString(String s ) {
+
+    //     // Step 1
+    //     String parkCode = ( s.equals( "" ) ) ? "" : "parkCode="+s+"&";
+
+    //     try {
+    //         URL url = new URL( M_HTTP + parkCode + M_AUTHORIZATION );
+
+    //         // Step 2
+    //         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+    //         // Step 3
+    //         // conn.setRequestProperty( "Authorization" , "Bearer " + M_AUTHORIZATION );
+    //         // conn.setRequestProperty( "Content-Type" , "application/json" );
+    //         conn.setRequestMethod( "GET" );
+
+    //         /////////////////////////////////////////////
+    //         // Extract the Response
+    //         // Step 1: Extract the Buffer
+    //         // Step 2: Populate the Response
+    //         // Step 3: Store the Response in a JSON Format
+    //         // Step 4: Extract the Budjet Parameter
+    //         /////////////////////////////////////////////
+
+    //         // Step 1
+    //         BufferedReader in = new BufferedReader( new InputStreamReader( conn.getInputStream() ) );
+         
+    //         // Step 2
+    //         String output; 
+    //         StringBuilder response = new StringBuilder();
+    //         int i=0;
+    //         while ( ( output = in.readLine() ) != null ) {
+    //             response.append( output );  
+    //         }
+    //         in.close();
+
+    //         return response.toString();
+    //     } catch( Exception e ) {
+    //         e.printStackTrace();
+    //     }
+    //     return null;
+    // }
 }

@@ -1,12 +1,11 @@
 package com.cedric.strideup.controller;
 
-import java.util.ArrayList;
-
 import com.cedric.strideup.models_dao.DataString;
-import com.cedric.strideup.models_dao.extra_dao.Response2;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.fetch.FetchALL;
-import com.cedric.strideup.services.fetch.FetchSingle;
+import com.cedric.strideup.services.fetch.FetchByParkCode;
+import com.cedric.strideup.services.fetch.FetchByStates;
+import com.cedric.strideup.services.fetch.IFetch;
 import com.cedric.strideup.services.update.PostJSON;
 import com.cedric.strideup.services.update.PutJSON;
 
@@ -39,8 +38,9 @@ public class MainController {
     PostJSON postJSON = new PostJSON();
     PutJSON putJSON = new PutJSON();
     
-    FetchALL fetchALL = new FetchALL();
-    FetchSingle fetchSingleParkCode = new FetchSingle();
+    IFetch fetchALL = new FetchALL();
+    IFetch fetchSingleParkCode = new FetchByParkCode();
+    IFetch fetchStates = new FetchByStates();
 
     @Autowired
     private DataStringRepo dataStringRepo;
@@ -52,6 +52,16 @@ public class MainController {
     public @ResponseBody ResponseEntity<String> getAll() {
         
         JSONObject res = fetchALL.getAll( dataStringRepo );
+        
+        if( res == null )
+            return new ResponseEntity<String>( HttpStatus.NOT_FOUND );
+        return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
+    }
+    
+    @RequestMapping( path="/parks/states/{states}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8")
+    public @ResponseBody ResponseEntity<String> getUnitStates(@PathVariable("states") String states ) {
+        
+        JSONObject res = fetchStates.getUnit(states, dataStringRepo);
         
         if( res == null )
             return new ResponseEntity<String>( HttpStatus.NOT_FOUND );

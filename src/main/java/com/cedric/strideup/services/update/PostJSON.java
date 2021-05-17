@@ -5,6 +5,7 @@ import java.util.List;
 import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
+import com.cedric.strideup.services.features.JSONProcessing;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,13 +33,15 @@ public class PostJSON {
             return null;
 
         // Check if the parkCode exist in the Remote API
-        JSONObject json = getAPI.getAPI( ds.getString("parkCode") );
+        getAPI.constructParam_ParkCode( ds.getString("parkCode") );
+        JSONObject json = getAPI.getAPIFlex();
+
         int jsonSize = json.getJSONArray("data").length();
         if( jsonSize == 1 )
             return null;
 
         // Save the new Park in the Internal Database
-        DataString d = new DataString( ds.getString("parkCode") , dst );
+        DataString d = new DataString( ds.getString("parkCode") , ds.getString("states") , dst );
         dataStringRepo.save( d );
 
         return ds;
@@ -51,6 +54,8 @@ public class PostJSON {
  
         // Create the JSONObject corresponding to the newly created object
         JSONObject resObj = new JSONObject();
+        JSONProcessing.makeTheJSONObjectOrdered(resObj);
+        
         JSONArray resArr = new JSONArray();
         JSONObject resBody = new JSONObject(dataStringList.get(0).getBody());
         resArr.put( resBody );
