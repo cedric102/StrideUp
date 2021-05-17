@@ -8,6 +8,7 @@ The objectives are to develop an API that could
  - Put does not take any request parameters. the parkCode is provided in the Request Body
 
 ## API Spec ( OpenAPI specification )
+```
 paths:
   /parks:
     get:
@@ -75,6 +76,7 @@ paths:
               type: object
               properties:
                 refer to rdm API
+```
 
 ## What technologies have been used ?
  - Spring Framework has been used for this exercise.
