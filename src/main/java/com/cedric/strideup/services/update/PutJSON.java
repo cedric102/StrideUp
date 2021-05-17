@@ -65,15 +65,8 @@ public class PutJSON {
         }
     }
     
-    /**
-     * @Purpose : Update the already existing park identified as 'parkCode'
-     *            unless the park does not exist yet
-     * @param dst
-     * @param dataStringRepo
-     * @return JSONObject or null
-     */
-    public JSONObject put( String dst , DataStringRepo dataStringRepo ) {
-    
+    private JSONObject saveToDB( String dst , DataStringRepo dataStringRepo ){
+
         JSONObject ds = new JSONObject(dst);
         DataString dsExists = dataStringRepo.findByParkCode( ds.getString("parkCode") );
         JSONObject json;
@@ -91,7 +84,12 @@ public class PutJSON {
         // Update the new entity
         DataString d = new DataString( ds.getString("parkCode") , dst );
         dataStringRepo.save( d );
- 
+
+        return ds;
+    }
+
+    private JSONObject retreiveFromDB( JSONObject ds , DataStringRepo dataStringRepo ){
+
         // Fetch the same fata from the Database
         List<DataString> dataStringList = dataStringRepo.findAllByParkCode( ds.getString("parkCode") );
 
@@ -130,6 +128,28 @@ public class PutJSON {
         
         // Return the JSONObject
         return tempObj;
+
+    }
+
+    /**
+     * @Purpose : Update the already existing park identified as 'parkCode'
+     *            unless the park does not exist yet
+     * @param dst
+     * @param dataStringRepo
+     * @return JSONObject or null
+     */
+    public JSONObject put( String dst , DataStringRepo dataStringRepo ) {
+    
+        // Update the entry in the DB
+        JSONObject ds = saveToDB( dst , dataStringRepo );
+        if( ds == null )
+            return null;
+
+        // Extract the newly Updated Park from the Internal Database
+        JSONObject resJSON = retreiveFromDB( ds , dataStringRepo );
+
+        // Return the result
+        return resJSON;
         
     }
 }

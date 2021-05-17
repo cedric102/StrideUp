@@ -21,13 +21,8 @@ import org.json.JSONObject;
 public class PostJSON {
 
     private GetAPI getAPI = new GetAPI();
-    /**
-     * @Purpose : Create a new Park if it noes not exist yet
-     * @param dst
-     * @param dataStringRepo
-     * @return JSONObject or null
-     */
-    public JSONObject post( String dst , DataStringRepo dataStringRepo) {
+
+    private JSONObject saveToDB( String dst , DataStringRepo dataStringRepo ){
 
         JSONObject ds = new JSONObject(dst);
 
@@ -45,22 +40,46 @@ public class PostJSON {
         // Save the new Park in the Internal Database
         DataString d = new DataString( ds.getString("parkCode") , dst );
         dataStringRepo.save( d );
- 
+
+        return ds;
+    }
+
+    private JSONObject retreiveFromDB( JSONObject ds , DataStringRepo dataStringRepo ){
+
         // Extract the newly created Park from the Internal Database
         List<DataString> dataStringList = dataStringRepo.findAllByParkCode( ds.getString("parkCode") );
  
         // Create the JSONObject corresponding to the newly created object
-        JSONObject tempObj = new JSONObject();
-        JSONArray tempArr = new JSONArray();
-        JSONObject tempBody = new JSONObject(dataStringList.get(0).getBody());
-        tempArr.put( tempBody );
-        tempObj.put("total" , ""+tempArr.length());
-        tempObj.put("limit" , "50");
-        tempObj.put("start" , "0");
-        tempObj.put("data" , tempArr);
-        
+        JSONObject resObj = new JSONObject();
+        JSONArray resArr = new JSONArray();
+        JSONObject resBody = new JSONObject(dataStringList.get(0).getBody());
+        resArr.put( resBody );
+        resObj.put("total" , ""+resArr.length());
+        resObj.put("limit" , "50");
+        resObj.put("start" , "0");
+        resObj.put("data" , resArr);
+
+        return resObj;
+    }
+
+    /**
+     * @Purpose : Create a new Park if it noes not exist yet
+     * @param dst
+     * @param dataStringRepo
+     * @return JSONObject or null
+     */
+    public JSONObject post( String dst , DataStringRepo dataStringRepo) {
+
+        // Save the entry in the DB
+        JSONObject ds = saveToDB( dst , dataStringRepo );
+        if( ds == null )
+            return null;
+
+        // Extract the newly created Park from the Internal Database
+        JSONObject resJSON = retreiveFromDB( ds , dataStringRepo );
+
         // Return the result
-        return tempObj;
+        return resJSON;
         
     }
     
