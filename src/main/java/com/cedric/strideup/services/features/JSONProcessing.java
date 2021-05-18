@@ -16,7 +16,7 @@ public class JSONProcessing {
             changeMap.setAccessible(false);
             
         } catch( Exception e ) {
-    
+            e.printStackTrace();
         }
     }
     

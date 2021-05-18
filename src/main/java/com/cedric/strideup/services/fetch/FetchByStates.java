@@ -23,10 +23,11 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchByStates extends IFetch {
+public class FetchByStates extends FetchImpl {
 
     private GetAPI getAPI = new GetAPI();
     private Map<String ,String> mp;
+    private String states;
 
     public FetchByStates() {}
 
@@ -43,10 +44,9 @@ public class FetchByStates extends IFetch {
      */
 
     // Fetch from the Repote API and populate the Map
-    protected void extractFromAPI ( String states ) {
+    private void extractFromAPI () {
 
         // Fetch from the Remote API
-        getAPI.constructParam_States( states );
         JSONObject obj = getAPI.getAPIFlex( );
 
         // Populate the Map
@@ -59,10 +59,10 @@ public class FetchByStates extends IFetch {
     }
 
     // Fetch from the Internal Database and populate / override the Map
-    protected void extractFromDB ( String states , DataStringRepo dataStringRepo ) {
+    private void extractFromDB ( DataStringRepo dataStringRepo ) {
 
         // Fetch from the Internal Database
-        List<DataString> t = dataStringRepo.findAllByStates( states );
+        List<DataString> t = dataStringRepo.findAllByStates( this.states );
 
         // Populate / Override the Map
         for( DataString d : t ) {
@@ -71,9 +71,9 @@ public class FetchByStates extends IFetch {
 
     }
 
-    @Override
+    // @Override
     // Build the JSONObject to be returned.
-    protected JSONObject buildJSON() {
+    private JSONObject buildJSON() {
 
         JSONArray parkArray = new JSONArray();
         JSONObject mainBody = new JSONObject();
@@ -104,8 +104,11 @@ public class FetchByStates extends IFetch {
         
         this.mp = new HashMap<String ,String>();
 
-        extractFromAPI( states );
-        extractFromDB( states , dataStringRepo );
+        this.states = states;
+        getAPI.constructParam_States( this.states );
+
+        extractFromAPI();
+        extractFromDB( dataStringRepo );
 
         JSONObject res = buildJSON();
         

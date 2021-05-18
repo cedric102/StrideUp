@@ -21,7 +21,7 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchByParkCode extends IFetch {
+public class FetchByParkCode extends FetchImpl {
 
     private GetAPI getAPI = new GetAPI();
 
@@ -38,8 +38,7 @@ public class FetchByParkCode extends IFetch {
      * @param dataStringRepo
      * @return JSONObject
      */
-    @Override
-    protected JSONObject getUnit_CheckDB( String parkCode , DataStringRepo dataStringRepo ) {
+    private JSONObject getUnit_CheckDB( String parkCode , DataStringRepo dataStringRepo ) {
 
         List<DataString> dataStringList = dataStringRepo.findAllByParkCode( parkCode );
 
@@ -68,9 +67,7 @@ public class FetchByParkCode extends IFetch {
      * @param dataStringRepo
      * @return JSONObject
      */
-    @Override
-    protected JSONObject getUnit_CheckAPI( String parkCode ) {
-        getAPI.constructParam_ParkCode( parkCode );
+    private JSONObject getUnit_CheckAPI( String parkCode ) {
         JSONObject json = getAPI.getAPIFlex( ); 
         JSONObject mainBody = new JSONObject();
         JSONProcessing.makeTheJSONObjectOrdered( mainBody );
@@ -110,6 +107,8 @@ public class FetchByParkCode extends IFetch {
      */
     @Override
     public JSONObject getUnit( String parkCode , DataStringRepo dataStringRepo ) {
+        
+        getAPI.constructParam_ParkCode( parkCode );
         
         // Check the Internal DB.
         // If the Park exists, return its JSONObject.

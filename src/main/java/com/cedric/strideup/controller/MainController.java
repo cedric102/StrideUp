@@ -5,7 +5,7 @@ import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.fetch.FetchALL;
 import com.cedric.strideup.services.fetch.FetchByParkCode;
 import com.cedric.strideup.services.fetch.FetchByStates;
-import com.cedric.strideup.services.fetch.IFetch;
+import com.cedric.strideup.services.fetch.FetchImpl;
 import com.cedric.strideup.services.update.PostJSON;
 import com.cedric.strideup.services.update.PutJSON;
 
@@ -38,9 +38,9 @@ public class MainController {
     PostJSON postJSON = new PostJSON();
     PutJSON putJSON = new PutJSON();
     
-    IFetch fetchALL = new FetchALL();
-    IFetch fetchSingleParkCode = new FetchByParkCode();
-    IFetch fetchStates = new FetchByStates();
+    FetchImpl fetchALL = new FetchALL();
+    FetchImpl fetchSingleParkCode = new FetchByParkCode();
+    FetchImpl fetchStates = new FetchByStates();
 
     @Autowired
     private DataStringRepo dataStringRepo;

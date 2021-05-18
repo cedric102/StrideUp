@@ -79,6 +79,7 @@ public class GetAPI {
             return new JSONObject( response.toString() );
         } catch( Exception e ) {
             e.printStackTrace();
+            this.params = "";
         }
         return null;
     }

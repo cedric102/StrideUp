@@ -23,7 +23,7 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchALL extends IFetch {
+public class FetchALL extends FetchImpl {
 
     private GetAPI getAPI = new GetAPI();
     private Map<String ,String> mp;
@@ -34,9 +34,8 @@ public class FetchALL extends IFetch {
         this.getAPI = getAPI;
     }
 
-    @Override
     // Fetch from the Repote API and populate the Map
-    protected void extractFromAPI () {
+    private void extractFromAPI () {
 
         // Fetch from the Remote API
         JSONObject obj = getAPI.getAPIFlex( );
@@ -50,9 +49,8 @@ public class FetchALL extends IFetch {
 
     }
 
-    @Override
     // Fetch from the Internal Database and populate / override the Map
-    protected void extractFromDB ( DataStringRepo dataStringRepo ) {
+    private void extractFromDB ( DataStringRepo dataStringRepo ) {
 
         // Fetch from the Internal Database
         List<DataString> t = dataStringRepo.findAll();
@@ -64,9 +62,8 @@ public class FetchALL extends IFetch {
 
     }
 
-    @Override
     // Build the JSONObject to be returned.
-    protected JSONObject buildJSON() {
+    private JSONObject buildJSON() {
 
         JSONArray parkArray = new JSONArray();
         JSONObject mainBody = new JSONObject();
@@ -81,6 +78,7 @@ public class FetchALL extends IFetch {
 
         return mainBody;
     }
+
     /**
      * @Purpose : Inorder, perform the RemoteAPI Fetch, Internal DB Fetch, and JSON Build
      * @Note : For each of RemoteAPI Fetch, Internal DB Fetch , The Map needs to be updated
