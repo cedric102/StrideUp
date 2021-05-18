@@ -1,13 +1,9 @@
 package com.cedric.strideup.services.fetch;
 
-import java.util.List;
-
-import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
-import com.cedric.strideup.services.features.JSONProcessing;
+import com.cedric.strideup.services.fetch.extract.ExtractUnitFrom;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -21,78 +17,17 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchByParkCode extends FetchImpl {
+public class FetchByParkCode extends ExtractUnitFrom {
 
-    private GetAPI getAPI = new GetAPI();
+    // private GetAPI getAPI;
+    // private String parkCode;
 
-    public FetchByParkCode() {}
+    public FetchByParkCode() {
+        this.getAPI = new GetAPI();
+    }
 
     public FetchByParkCode( GetAPI getAPI ) {
         this.getAPI = getAPI;
-    }
-
-    /**
-     * @Purpose : Check the Internal Database for the identified 'parkCode'
-     * @Note : If the identified 'parkNode' does not exist in the InternalDB, return null
-     * @param parkCode
-     * @param dataStringRepo
-     * @return JSONObject
-     */
-    private JSONObject getUnit_CheckDB( String parkCode , DataStringRepo dataStringRepo ) {
-
-        List<DataString> dataStringList = dataStringRepo.findAllByParkCode( parkCode );
-
-        JSONObject mainBody = new JSONObject();
-        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
-
-        JSONArray parkArray = new JSONArray();
-        mainBody.put("total" , "1");
-        mainBody.put("limit" , "50");
-        mainBody.put("start" , "0");
-
-        if( dataStringList.isEmpty() == false ) {
-            JSONObject tempBody = new JSONObject(dataStringList.get(0).getBody());
-            parkArray.put( tempBody );
-            mainBody.put("data" , parkArray);
-
-            return mainBody;
-        }
-        return null;
-    }
-    
-    /**
-     * @Purpose : Check the RemoreAPI for the identified 'parkCode'
-     * @Note : If the identified 'parkNode' does not exist in the RemoteAPI, return null
-     * @param parkCode
-     * @param dataStringRepo
-     * @return JSONObject
-     */
-    private JSONObject getUnit_CheckAPI( String parkCode ) {
-        JSONObject json = getAPI.getAPIFlex( ); 
-        JSONObject mainBody = new JSONObject();
-        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
-
-        JSONArray parkArray = new JSONArray();
-        mainBody.put("total" , "1");
-        mainBody.put("limit" , "50");
-        mainBody.put("start" , "0");
-        if( json != null ) {
-            try {
-                JSONObject tempBody = new JSONObject( json.getJSONArray("data").getJSONObject(0).toString() );
-
-                String s2 = tempBody.getString("parkCode");
-                if( s2.equals(parkCode) ) {
-                    parkArray.put( tempBody );
-                    mainBody.put("data" , parkArray);
-                    
-                    return mainBody;
-                }
-            } catch( Exception e ) {
-                e.printStackTrace();
-            }
-    
-        }
-        return null;
     }
 
     /**
@@ -105,23 +40,23 @@ public class FetchByParkCode extends FetchImpl {
      * @param dataStringRepo
      * @return
      */
-    @Override
     public JSONObject getUnit( String parkCode , DataStringRepo dataStringRepo ) {
         
-        getAPI.constructParam_ParkCode( parkCode );
-        
+        this.parkCode = parkCode;
+        this.getAPI.constructParam_ParkCode( parkCode );
+
         // Check the Internal DB.
         // If the Park exists, return its JSONObject.
-        JSONObject resJsonObject = getUnit_CheckDB( parkCode , dataStringRepo );
+        JSONObject resJsonObject = this.getUnit_CheckDB( dataStringRepo );
         if( resJsonObject != null )
             return resJsonObject;
         
         // Check the RemoteAPI.
         // If the Park exists, return its JSONObject.
-        resJsonObject = getUnit_CheckAPI( parkCode );
+        resJsonObject = this.getUnit_CheckAPI();
         if( resJsonObject != null )
             return resJsonObject;
-        
+
         // If the Park does not exist in both the IntetnalDB and the RemoteAPI,
         return null;
     }

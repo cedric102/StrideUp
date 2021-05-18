@@ -1,15 +1,11 @@
 package com.cedric.strideup.services.fetch;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
-import com.cedric.strideup.services.features.JSONProcessing;
+import com.cedric.strideup.services.fetch.extract.ExtractFrom;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -23,60 +19,20 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchALL extends FetchImpl {
+public class FetchALL extends ExtractFrom {
 
-    private GetAPI getAPI = new GetAPI();
-    private Map<String ,String> mp;
+    // private GetAPI getAPI = new GetAPI();
+    // private Map<String ,String> mp;
+    // private List<DataString> t;
 
-    public FetchALL() {}
+    public FetchALL() {
+        this.mp = new HashMap<String ,String>();
+        this.getAPI = new GetAPI();
+    }
 
     public FetchALL( GetAPI getAPI ) {
         this.getAPI = getAPI;
-    }
-
-    // Fetch from the Repote API and populate the Map
-    private void extractFromAPI () {
-
-        // Fetch from the Remote API
-        JSONObject obj = getAPI.getAPIFlex( );
-
-        // Populate the Map
-        JSONArray arr = obj.getJSONArray("data");
-        for( int i=0 ; i<arr.length() ; i++ ) {
-            JSONObject temp = arr.getJSONObject(i);
-            this.mp.put( temp.getString("parkCode") , temp.toString() );
-        }
-
-    }
-
-    // Fetch from the Internal Database and populate / override the Map
-    private void extractFromDB ( DataStringRepo dataStringRepo ) {
-
-        // Fetch from the Internal Database
-        List<DataString> t = dataStringRepo.findAll();
-
-        // Populate / Override the Map
-        for( DataString d : t ) {
-            this.mp.put( d.getParkCode() , d.getBody().toString() );
-        }
-
-    }
-
-    // Build the JSONObject to be returned.
-    private JSONObject buildJSON() {
-
-        JSONArray parkArray = new JSONArray();
-        JSONObject mainBody = new JSONObject();
-        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
-
-        mainBody.put("total" , ""+this.mp.size() );
-        mainBody.put("limit" , "50");
-        mainBody.put("start" , "0");
-        for( Map.Entry<String, String> s : this.mp.entrySet() )
-            parkArray.put( new JSONObject( s.getValue() ) );
-        mainBody.put("data" , parkArray);
-
-        return mainBody;
+        this.mp = new HashMap<String ,String>();
     }
 
     /**
@@ -85,15 +41,17 @@ public class FetchALL extends FetchImpl {
      * @param dataStringRepo
      * @return JSONObject
      */
-    @Override
     public JSONObject getAll( DataStringRepo dataStringRepo ) {
-        this.mp = new HashMap<String ,String>();
 
-        extractFromAPI();
-        extractFromDB( dataStringRepo );
+        this.extractFromAPI();
 
-        JSONObject res = buildJSON();
+        this.t = dataStringRepo.findAll();
+        this.extractFromDB();
+
+        JSONObject res = this.buildJSON();
         
+        this.mp.clear();
+
         return res;
     }
     

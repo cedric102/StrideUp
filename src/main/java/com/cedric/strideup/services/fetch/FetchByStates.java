@@ -1,15 +1,11 @@
 package com.cedric.strideup.services.fetch;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
-import com.cedric.strideup.services.features.JSONProcessing;
+import com.cedric.strideup.services.fetch.extract.ExtractFrom;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -23,70 +19,15 @@ import org.json.JSONObject;
  *             The DB Scan will override it next.
  * @Author : C. Carteron
  */
-public class FetchByStates extends FetchImpl {
+public class FetchByStates extends ExtractFrom {
 
-    private GetAPI getAPI = new GetAPI();
-    private Map<String ,String> mp;
-    private String states;
-
-    public FetchByStates() {}
+    public FetchByStates() {
+        this.getAPI = new GetAPI();
+        this.mp = new HashMap<String ,String>();
+    }
 
     public FetchByStates( GetAPI getAPI ) {
         this.getAPI = getAPI;
-    }
-
-    /**
-     * @Purpose : Check the Internal Database for the identified 'parkCode'
-     * @Note : If the identified 'parkNode' does not exist in the InternalDB, return null
-     * @param parkCode
-     * @param dataStringRepo
-     * @return JSONObject
-     */
-
-    // Fetch from the Repote API and populate the Map
-    private void extractFromAPI () {
-
-        // Fetch from the Remote API
-        JSONObject obj = getAPI.getAPIFlex( );
-
-        // Populate the Map
-        JSONArray arr = obj.getJSONArray("data");
-        for( int i=0 ; i<arr.length() ; i++ ) {
-            JSONObject temp = arr.getJSONObject(i);
-            this.mp.put( temp.getString("parkCode") , temp.toString() );
-        }
-
-    }
-
-    // Fetch from the Internal Database and populate / override the Map
-    private void extractFromDB ( DataStringRepo dataStringRepo ) {
-
-        // Fetch from the Internal Database
-        List<DataString> t = dataStringRepo.findAllByStates( this.states );
-
-        // Populate / Override the Map
-        for( DataString d : t ) {
-            this.mp.put( d.getParkCode() , d.getBody().toString() );
-        }
-
-    }
-
-    // @Override
-    // Build the JSONObject to be returned.
-    private JSONObject buildJSON() {
-
-        JSONArray parkArray = new JSONArray();
-        JSONObject mainBody = new JSONObject();
-        JSONProcessing.makeTheJSONObjectOrdered( mainBody );
-
-        mainBody.put("total" , ""+this.mp.size() );
-        mainBody.put("limit" , "50");
-        mainBody.put("start" , "0");
-        for( Map.Entry<String, String> s : this.mp.entrySet() )
-            parkArray.put( new JSONObject( s.getValue() ) );
-        mainBody.put("data" , parkArray);
-
-        return mainBody;
     }
 
     /**
@@ -99,20 +40,22 @@ public class FetchByStates extends FetchImpl {
      * @param dataStringRepo
      * @return
      */
-    @Override
     public JSONObject getUnit( String states , DataStringRepo dataStringRepo ) {
-        
-        this.mp = new HashMap<String ,String>();
 
         this.states = states;
-        getAPI.constructParam_States( this.states );
+        this.getAPI.constructParam_States( this.states );
+        this.extractFromAPI();
 
-        extractFromAPI();
-        extractFromDB( dataStringRepo );
+        // Fetch from the Internal Database
+        this.t = dataStringRepo.findAllByStates( this.states );
+        this.extractFromDB();
 
         JSONObject res = buildJSON();
         
+        this.mp.clear();
+
         return res;
+        
     }
     
 }

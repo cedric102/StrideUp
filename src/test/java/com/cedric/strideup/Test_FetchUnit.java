@@ -11,7 +11,6 @@ import com.cedric.strideup.models_dao.DataString;
 import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.GetAPI;
 import com.cedric.strideup.services.fetch.FetchByParkCode;
-import com.cedric.strideup.services.fetch.FetchImpl;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -25,7 +24,7 @@ import org.mockito.Mockito;
  */
 public class Test_FetchUnit {
 
-    FetchImpl fetchSingle = null;
+    FetchByParkCode fetchSingle = null;
     GetAPI getAPI = mock(GetAPI.class);
     DataStringRepo dataStringRepo = mock(DataStringRepo.class);
 
