@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  *   - PUT /parks/{park code} - update the existing park identified by 'park code'
  */
 @RestController
-@RequestMapping( path="/" )
+@RequestMapping( path="/" , produces = "application/json; charset=UTF-8" )
 public class MainController {
 
     JSONParser parser;
@@ -47,7 +47,7 @@ public class MainController {
 
     DataString ds = new DataString();
 
-    @RequestMapping( path="/parks" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8")
+    @RequestMapping( path="/parks" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8" )
     public @ResponseBody ResponseEntity<String> getAll() {
         
         JSONObject res = fetchALL.getAll( dataStringRepo );
@@ -57,7 +57,7 @@ public class MainController {
         return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
     }
     
-    @RequestMapping( path="/parks/states/{states}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8")
+    @RequestMapping( path="/parks/states/{states}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8" )
     public @ResponseBody ResponseEntity<String> getUnitStates(@PathVariable("states") String states ) {
         
         JSONObject res = fetchStates.getUnit(states, dataStringRepo);
@@ -67,7 +67,7 @@ public class MainController {
         return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
     }
     
-    @RequestMapping( path="/parks/{parkCode}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8")
+    @RequestMapping( path="/parks/{parkCode}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8" )
     public @ResponseBody ResponseEntity<String> getUnit(@PathVariable("parkCode") String parkCode ) {
         
         JSONObject res = fetchSingleParkCode.getUnit(parkCode, dataStringRepo);
@@ -77,7 +77,7 @@ public class MainController {
         return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
     }
     
-    @RequestMapping( path="/parksTest/{parkCode}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8")
+    @RequestMapping( path="/parksTest/{parkCode}" , method = RequestMethod.GET , produces = "application/json; charset=UTF-8" )
     public @ResponseBody ResponseEntity<String> getUnitTest(@PathVariable("parkCode") String parkCode , DataStringRepo dataStringRepo ) {
         
         this.dataStringRepo = dataStringRepo;
@@ -88,7 +88,7 @@ public class MainController {
         return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
     }
 
-    @RequestMapping( path="/parks" , method = RequestMethod.POST , produces = "application/json; charset=UTF-8")
+    @RequestMapping( path="/parks" , method = RequestMethod.POST , produces = "application/json; charset=UTF-8" )
     public @ResponseBody ResponseEntity<String> post( @RequestBody String dst ) {
 
         JSONObject saved = updateMgmt.saveToDB_IfAbsent( dst , dataStringRepo );
