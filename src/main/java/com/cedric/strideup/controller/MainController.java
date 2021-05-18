@@ -5,8 +5,8 @@ import com.cedric.strideup.repositories.DataStringRepo;
 import com.cedric.strideup.services.fetch.FetchALL;
 import com.cedric.strideup.services.fetch.FetchByParkCode;
 import com.cedric.strideup.services.fetch.FetchByStates;
-import com.cedric.strideup.services.update.PostJSON;
-import com.cedric.strideup.services.update.PutJSON;
+import com.cedric.strideup.services.update.FetchMgmt;
+import com.cedric.strideup.services.update.UpdateMgmt;
 
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.JSONObject;
@@ -34,8 +34,8 @@ public class MainController {
 
     JSONParser parser;
 
-    PostJSON postJSON = new PostJSON();
-    PutJSON putJSON = new PutJSON();
+    UpdateMgmt updateMgmt = new UpdateMgmt();
+    FetchMgmt fetchMgmt = new FetchMgmt();
     
     FetchALL fetchALL = new FetchALL();
     FetchByParkCode fetchSingleParkCode = new FetchByParkCode();
@@ -91,9 +91,12 @@ public class MainController {
     @RequestMapping( path="/parks" , method = RequestMethod.POST , produces = "application/json; charset=UTF-8")
     public @ResponseBody ResponseEntity<String> post( @RequestBody String dst ) {
 
-        JSONObject res = postJSON.post(dst, dataStringRepo);
-        if( res == null )
+        JSONObject saved = updateMgmt.saveToDB_IfAbsent( dst , dataStringRepo );
+        if( saved == null )
             return new ResponseEntity<String>( HttpStatus.NOT_ACCEPTABLE );
+    
+        JSONObject res = fetchMgmt.fetchSingle( saved , dataStringRepo );
+        
         return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
         
     }
@@ -101,10 +104,12 @@ public class MainController {
     @PutMapping( path="/parks" , produces = "application/json; charset=UTF-8" )
     public @ResponseBody ResponseEntity<String> put( @RequestBody String dst ) {
     
-        JSONObject res = putJSON.put(dst, dataStringRepo);
+        JSONObject saved = updateMgmt.saveToDB_IfPresent( dst , dataStringRepo );
+        if( saved == null )
+            return new ResponseEntity<String>( HttpStatus.NOT_ACCEPTABLE );
+    
+        JSONObject res = fetchMgmt.fetchSingle( saved , dataStringRepo );
         
-        if( res == null )
-            return new ResponseEntity<String>( HttpStatus.NOT_FOUND );
         return new ResponseEntity<String>( res.toString() , HttpStatus.OK);
         
     }

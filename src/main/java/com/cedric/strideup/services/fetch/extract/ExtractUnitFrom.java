@@ -12,7 +12,7 @@ import com.cedric.strideup.services.features.JSONProcessing;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ExtractUnitFrom {
+public class ExtractUnitFrom implements IExtractUnitFrom {
     
     public GetAPI getAPI;
     public Map<String ,String> mp;

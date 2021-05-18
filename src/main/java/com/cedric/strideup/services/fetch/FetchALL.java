@@ -21,10 +21,6 @@ import org.json.JSONObject;
  */
 public class FetchALL extends ExtractFrom {
 
-    // private GetAPI getAPI = new GetAPI();
-    // private Map<String ,String> mp;
-    // private List<DataString> t;
-
     public FetchALL() {
         this.mp = new HashMap<String ,String>();
         this.getAPI = new GetAPI();

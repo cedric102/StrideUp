@@ -19,9 +19,6 @@ import org.json.JSONObject;
  */
 public class FetchByParkCode extends ExtractUnitFrom {
 
-    // private GetAPI getAPI;
-    // private String parkCode;
-
     public FetchByParkCode() {
         this.getAPI = new GetAPI();
     }
@@ -59,6 +56,7 @@ public class FetchByParkCode extends ExtractUnitFrom {
 
         // If the Park does not exist in both the IntetnalDB and the RemoteAPI,
         return null;
+        
     }
     
 }
